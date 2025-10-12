@@ -1,0 +1,269 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Main.master.cs" Inherits="DirectorOfScheme.Main" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> -Director of Education(Scheme)</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/caedfdc778.js" crossorigin="anonymous"></script>
+
+        <link href="Images/logoMaharashtra.svg" rel="shortcut icon" type="image/x-icon" />
+    <script src="https://kit.fontawesome.com/caedfdc778.js" crossorigin="anonymous"></script>
+ <script>
+     function disableCopy(event) {
+         if (event.ctrlKey && event.keyCode === 67) {
+             event.preventDefault();
+         }
+     }
+ </script>
+    <!--Ctrl+C Ctrl+V Disable Script E-->
+
+    <!--Captcha Code Refresh S-->
+    <script>
+        function refreshPage() {
+            location.reload();
+        }
+    </script>
+
+    <script type="text/javascript">
+        // Function to generate and display a new captcha image
+        function refreshCaptcha() {
+            // Call your server-side method to regenerate the captcha
+            PageMethods.GenerateCaptcha(onSuccess, onError);
+        }
+
+        // Callback function for successful captcha refresh
+        function onSuccess(result) {
+            // Update the captcha image with the new one
+            document.getElementById("captchaImage").src = result;
+        }
+
+        // Callback function for error during captcha refresh
+        function onError(error) {
+            alert("An error occurred while refreshing captcha: " + error.get_message());
+        }
+    </script>
+    <!--Captcha Code Refresh E-->
+     <!--Auto capital text in texbox script starts here-->
+    <script>
+        function capitalizeInput(element) {
+            var inputValue = element.value;
+            element.value = inputValue.toUpperCase();
+        }
+    </script>
+    <!--Auto capital text in texbox script ends here-->
+
+    <!-- JS to hide/show on scroll -->
+    <script>
+        let prevScrollPos = window.pageYOffset;
+        const header = document.getElementById("govHeader");
+
+        window.onscroll = function () {
+            let currentScrollPos = window.pageYOffset;
+            if (prevScrollPos < currentScrollPos) {
+                // scrolling down → hide
+                header.style.top = "-80px"; // adjust based on header height
+            } else {
+                // scrolling up → show
+                header.style.top = "0";
+            }
+            prevScrollPos = currentScrollPos;
+        }
+    </script>
+
+    <!-- Extra CSS for smooth effect -->
+    <style>
+        #govHeader {
+            transition: top 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <form runat="server">
+
+
+        <div id="govHeader" class="sticky-top bg-light shadow-sm">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="fw-bold m-2">महाराष्ट्र शासन | Government of Maharashtra</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="fw-bold m-2">
+                           फोन:(०२०)२६१२३५१५ | Phone:(020)26123515 
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                         <p class="fw-bold m-2">
+     Email: directorscheme[dot]mh[at]gmail[dot]com 
+ </p>
+                     
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+
+      
+
+        <!-- -->
+
+<!--Header Starts-->
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-center align-items-center text-center flex-wrap">
+        
+        <!-- Left Logo -->
+        <img src="../Images/logoMaharashtra.svg"
+             alt="MainLogoOne"
+             class="img-fluid mx-3"
+             style="max-height:100px;" />
+
+        <!-- Middle Text -->
+        <div class="mx-4">
+            <div class="text-black fs-5 fw-bold">
+                <span class="text-secondary fw-bolder fs-5">महाराष्ट्र शासन</span><br />
+                <span class="fw-bolder">शिक्षण संचालनालय (योजना),महाराष्ट्र राज्य</span>
+
+                <hr class="border border-danger border-1 opacity-50 w-50 mx-auto">
+
+                <span class="text-secondary fw-bolder fs-5">Government of Maharashtra</span><br />
+                <span class="fw-bolder">Director of Education (Scheme),Maharashtra State</span>
+            </div>
+        </div>
+
+        <!-- Right Logo -->
+        <img src="../Images/national-emblem-india.png"
+             alt="MainLogoTwo"
+             class="img-fluid mx-3"
+             style="max-height:100px;" />
+
+    </div>
+</div>
+<!--Header Ends-->
+
+
+
+
+        <!-- -->
+        <!--UiKit nav s-->
+        <header class="navbar-light">
+            <nav class="navbar" style="background-color: cornflowerblue">
+                <div class="container-fluid">
+
+
+
+
+                    <ul class="nav justify-content-center">
+                        <li class="nav-item"><a href="../Homepage.aspx" class="nav-link px-2 mb-0 ms-3 text-white fw-bold"><i class="fa-solid fa-house"></i>&#160मुख्य पृष्ठ</a></li>
+                       
+                          <li class="nav-item"><a href="../DocumentsSection.aspx" class="nav-link px-2 mb-0 ms-3 text-white fw-bold"><i class="fa-solid fa-file"></i>&#160शासन निर्णय</a></li>
+                        	
+                    </ul>
+
+                </div>
+            </nav>
+        </header>
+
+
+   
+
+
+        <div class="container body-content">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+            <!--Footer by Vikas Pawar-->
+            <hr />
+            <footer class="footer">
+                <div class="container-fluid mt-2">
+                  
+                  
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p class="text-center">
+                                     <img src="../Images/logoMaharashtra.svg" alt="Logo 1" style="height: 55px;" />
+                                    Copyright &copy; 2025-26
+                               
+            
+                                    <br />
+                                  
+                                     हे  शिक्षण संचालनालय (योजना) विभागाचे  अधिकृत संकेतस्थळ आहे. सर्व हक्क सुरक्षित.
+                                    <br />
+                                   This is the official website of Director of Education (Scheme).All Rights Reserved.
+                                   
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+           
+            </footer>
+         
+
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+        </div>
+    </form>
+
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+</body>
+<!--Right Click Disable S-->
+<script type="text/javascript">  
+    var message = "Not Allowed!";
+
+    function click(event) {
+        if (event.which == 2 || event.which == 3) {
+            alert(message);
+            return false;
+        }
+    }
+    document.addEventListener("mousedown", click);
+    document.oncontextmenu = new Function("return false");
+</script>
+<script>
+    function searchGrid() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("txtSearch");  // Get the input element (TextBox)
+        filter = input.value.toUpperCase();            // Convert input value to uppercase for case-insensitive search
+        table = document.getElementById("gvGCCSHCertificates");  // Get the GridView element by ID
+
+        // Get all rows of the GridView
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all rows, starting from index 0 (which is the header row)
+        for (i = 0; i < tr.length; i++) {
+            // Check if the row is a data row (skip the header row)
+            if (tr[i].getElementsByTagName("td").length > 0) {
+                // Get the Candidate Name cell (adjust index based on your GridView columns)
+                td = tr[i].getElementsByTagName("td")[1]; // Index 1 for Candidate Name column, adjust as needed
+
+                if (td) {
+                    txtValue = td.textContent || td.innerText;  // Get the text content of the cell
+                    // Check if the text content matches the search filter
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";   // Display the row if it matches the search
+                    } else {
+                        tr[i].style.display = "none";  // Hide the row if it does not match the search
+                    }
+                }
+            }
+        }
+    }
+
+</script>
+
+</html>
