@@ -161,14 +161,14 @@
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-left">
       <h1 id="hero-title">Welcome to Director of Education (Scheme) Portal</h1>
-      <p class="lead">Centralized dashboard for scheme management. Access login below.</p>
+    <%--  <p class="lead">Centralized dashboard for scheme management. Access login below.</p>
 
       <asp:HyperLink ID="hlLogin" runat="server" NavigateUrl="~/School/SchoolLogin.aspx" CssClass="btn-primary">
         <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M10 17l5-5-5-5v10zM4 19h2V5H4v14z" fill="currentColor" />
         </svg>
         Login
-      </asp:HyperLink>
+      </asp:HyperLink>--%>
     </div>
 
     <div class="hero-right">
@@ -183,7 +183,7 @@
   </section>
 
   <footer>
-    <small>Beta Version 0.9.3 | &copy; 2025 Director of Education (Scheme)</small>
+    <small>Beta Version 0.9.7 | &copy; Director of Education (Scheme)</small>
   </footer>
 </div>
 

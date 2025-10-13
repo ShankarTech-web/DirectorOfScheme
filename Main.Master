@@ -162,7 +162,9 @@
                         <li class="nav-item"><a href="../Homepage.aspx" class="nav-link px-2 mb-0 ms-3 text-white fw-bold"><i class="fa-solid fa-house"></i>&#160मुख्य पृष्ठ</a></li>
                        
                           <li class="nav-item"><a href="../DocumentsSection.aspx" class="nav-link px-2 mb-0 ms-3 text-white fw-bold"><i class="fa-solid fa-file"></i>&#160शासन निर्णय</a></li>
-                        	
+
+                          <li class="nav-item"><a href="../School/SchoolLogin.aspx" class="nav-link px-2 mb-0 ms-3 text-white fw-bold"><i class="fa-solid fa-user"></i>&#160लॉगिन</a></li>
+              
                     </ul>
 
                 </div>
