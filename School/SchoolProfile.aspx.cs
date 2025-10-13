@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Configuration;
+using System.Data; // FIX: Added for CommandType and SqlDbType
 using System.Data.SqlClient;
+using System.IO;
 
 namespace DirectorOfScheme.School
 {
@@ -15,18 +17,24 @@ namespace DirectorOfScheme.School
                 string sessionToken = Session["AuthToken"] as string;
                 string queryToken = Request.QueryString["token"];
 
-                // ❌ If no token or mismatch → force login
                 if (string.IsNullOrEmpty(sessionToken) || queryToken != sessionToken)
                 {
                     Response.Redirect("SchoolLogin.aspx");
                     return;
                 }
 
-                // ✅ Now safe to load data
-                lbSchoolUdise.Text = Session["SchoolCode"].ToString();
-                lbSchoolName.Text = Session["schoolName"].ToString();
+                lbSchoolUdise.Text = Session["SchoolCode"]?.ToString();
+                lbSchoolName.Text = Session["schoolName"]?.ToString();
+
+                // FIX: Call LoadProfileStatus first to check if we need to load principal info
+                LoadProfileStatus();
+
+                // FIX: Load existing principal info if the profile is incomplete so it can be edited.
+                if (pnlPrincipalInfo.Visible)
+                {
+                    LoadPrincipalInfo();
+                }
             }
-            LoadProfileStatus();
         }
 
         private void LoadProfileStatus()
@@ -41,10 +49,17 @@ namespace DirectorOfScheme.School
                 object status = cmd.ExecuteScalar();
                 con.Close();
 
-                if (status != null)
+                if (status != null && status != DBNull.Value)
                 {
                     lbProfileStatus.Text = status.ToString();
-                    pnlPrincipalInfo.Visible = status.ToString().Equals("Incomplete", StringComparison.OrdinalIgnoreCase);
+                    // Show the panel if the profile is not yet complete
+                    pnlPrincipalInfo.Visible = !status.ToString().Equals("COMPLETE", StringComparison.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    // Default case if status is missing
+                    lbProfileStatus.Text = "Incomplete";
+                    pnlPrincipalInfo.Visible = true;
                 }
             }
         }
@@ -85,57 +100,131 @@ namespace DirectorOfScheme.School
             }
         }
 
+        // FIX: btnSavePrincipal_Click logic is completely rewritten for correctness and robustness.
         protected void btnSavePrincipal_Click(object sender, EventArgs e)
         {
-            using (SqlConnection con = new SqlConnection(conStr))
+            string schoolCode = Session["SchoolCode"].ToString();
+            string principalPhotoPath = null; // Will hold the path to the photo if uploaded
+
+            try
             {
-                string query = @"INSERT INTO SchoolPrincipal 
-                                (SchoolCode, PrincipalName, PrincipalMobile, PrincipalEmail, 
-                                 PrincipalAddress, PrincipalDOB, PrincipalQualification, StartDate, EndDate)
-                                VALUES (@SchoolCode, @PrincipalName, @PrincipalMobile, @PrincipalEmail, 
-                                        @PrincipalAddress, @PrincipalDOB, @PrincipalQualification, @StartDate, @EndDate)";
+                // --- 1. Handle File Upload Separately ---
+                if (fileuploadPrincipal.HasFile)
+                {
+                    string fileExtension = Path.GetExtension(fileuploadPrincipal.FileName).ToLower();
+                    if (fileExtension != ".jpg" && fileExtension != ".jpeg" && fileExtension != ".png")
+                    {
+                        Response.Write("<script>alert('Invalid file type. Only .jpg, .jpeg, or .png are allowed.');</script>");
+                        return;
+                    }
+                    if (fileuploadPrincipal.FileContent.Length > 100 * 1024) // 100 KB
+                    {
+                        Response.Write("<script>alert('File size exceeds the 100 KB limit.');</script>");
+                        return;
+                    }
 
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@SchoolCode", Session["SchoolCode"].ToString());
-                cmd.Parameters.AddWithValue("@PrincipalName", txtPrincipalName.Text.Trim());
-                cmd.Parameters.AddWithValue("@PrincipalMobile", txtPrincipalMobile.Text.Trim());
-                cmd.Parameters.AddWithValue("@PrincipalEmail", txtPrincipalEmail.Text.Trim());
-                cmd.Parameters.AddWithValue("@PrincipalAddress", txtPrincipalAddress.Text.Trim());
-                cmd.Parameters.AddWithValue("@PrincipalDOB", txtPrincipalDOB.Text.Trim());
-                cmd.Parameters.AddWithValue("@PrincipalQualification", txtPrincipalQualification.Text.Trim());
-                cmd.Parameters.AddWithValue("@StartDate", txtStartDate.Text.Trim());
-                cmd.Parameters.AddWithValue("@EndDate", txtEndDate.Text.Trim());
+                    // FIX: Use the session SchoolCode for a unique and correct file name
+                    string newFileName = schoolCode + fileExtension;
+                    string savePath = Server.MapPath("~/PrincipalsPhoto/");
+                    string filePath = Path.Combine(savePath, newFileName);
 
-                con.Open();
-                cmd.ExecuteNonQuery();
+                    // Create directory if it doesn't exist
+                    if (!Directory.Exists(savePath))
+                    {
+                        Directory.CreateDirectory(savePath);
+                    }
 
-                // Update profile status to complete
-                SqlCommand cmdUpdate = new SqlCommand("UPDATE SchoolInformation SET ProfileStatus='COMPLETE' WHERE SchoolCode=@SchoolCode", con);
-                cmdUpdate.Parameters.AddWithValue("@SchoolCode", Session["SchoolCode"].ToString());
-                cmdUpdate.ExecuteNonQuery();
+                    fileuploadPrincipal.SaveAs(filePath);
+                    principalPhotoPath = "~/PrincipalsPhoto/" + newFileName; // Store relative path for the database
+                }
 
-                con.Close();
+                // --- 2. Save Data to Database (UPDATE or INSERT) ---
+                using (SqlConnection con = new SqlConnection(conStr))
+                {
+                    con.Open();
+
+                    // Check if a principal record already exists for this school
+                    SqlCommand checkCmd = new SqlCommand("SELECT COUNT(*) FROM SchoolPrincipal WHERE SchoolCode = @SchoolCode", con);
+                    checkCmd.Parameters.AddWithValue("@SchoolCode", schoolCode);
+                    int existingRecords = (int)checkCmd.ExecuteScalar();
+
+                    string query;
+                    if (existingRecords > 0)
+                    {
+                        // UPDATE existing record
+                        query = @"UPDATE SchoolPrincipal SET 
+                                    PrincipalName=@PrincipalName, PrincipalMobile=@PrincipalMobile, PrincipalEmail=@PrincipalEmail,
+                                    PrincipalAddress=@PrincipalAddress, PrincipalDOB=@PrincipalDOB, 
+                                    PrincipalQualification=@PrincipalQualification, StartDate=@StartDate, EndDate=@EndDate
+                                    " + (principalPhotoPath != null ? ", PrincipalPhoto=@PrincipalPhoto " : "") + // Only update photo if a new one was uploaded
+                                  "WHERE SchoolCode=@SchoolCode";
+                    }
+                    else
+                    {
+                        // INSERT new record
+                        query = @"INSERT INTO SchoolPrincipal 
+                                    (SchoolCode, PrincipalName, PrincipalMobile, PrincipalEmail, PrincipalAddress, 
+                                    PrincipalDOB, PrincipalQualification, StartDate, EndDate, PrincipalPhoto)
+                                  VALUES 
+                                    (@SchoolCode, @PrincipalName, @PrincipalMobile, @PrincipalEmail, @PrincipalAddress, 
+                                    @PrincipalDOB, @PrincipalQualification, @StartDate, @EndDate, @PrincipalPhoto)";
+                    }
+
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@SchoolCode", schoolCode);
+                    cmd.Parameters.AddWithValue("@PrincipalName", txtPrincipalName.Text.Trim());
+                    cmd.Parameters.AddWithValue("@PrincipalMobile", txtPrincipalMobile.Text.Trim());
+                    cmd.Parameters.AddWithValue("@PrincipalEmail", txtPrincipalEmail.Text.Trim());
+                    cmd.Parameters.AddWithValue("@PrincipalAddress", txtPrincipalAddress.Text.Trim());
+                    cmd.Parameters.AddWithValue("@PrincipalQualification", txtPrincipalQualification.Text.Trim());
+
+                    // Handle nullable dates properly
+                    cmd.Parameters.AddWithValue("@PrincipalDOB", string.IsNullOrEmpty(txtPrincipalDOB.Text) ? (object)DBNull.Value : txtPrincipalDOB.Text.Trim());
+                    cmd.Parameters.AddWithValue("@StartDate", string.IsNullOrEmpty(txtStartDate.Text) ? (object)DBNull.Value : txtStartDate.Text.Trim());
+                    cmd.Parameters.AddWithValue("@EndDate", string.IsNullOrEmpty(txtEndDate.Text) ? (object)DBNull.Value : txtEndDate.Text.Trim());
+
+                    // Add photo path parameter
+                    if (principalPhotoPath != null)
+                    {
+                        cmd.Parameters.AddWithValue("@PrincipalPhoto", principalPhotoPath);
+                    }
+                    else if (existingRecords == 0)
+                    {
+                        // If inserting new record and no photo, pass NULL
+                        cmd.Parameters.AddWithValue("@PrincipalPhoto", DBNull.Value);
+                    }
+
+                    cmd.ExecuteNonQuery();
+
+                    // --- 3. Update Profile Status to COMPLETE ---
+                    SqlCommand cmdUpdate = new SqlCommand("UPDATE SchoolInformation SET ProfileStatus='COMPLETE' WHERE SchoolCode=@SchoolCode", con);
+                    cmdUpdate.Parameters.AddWithValue("@SchoolCode", schoolCode);
+                    cmdUpdate.ExecuteNonQuery();
+
+                    con.Close();
+                }
+
+                // --- 4. Refresh UI to Reflect Changes ---
+                LoadProfileStatus(); // This will now hide the panel as status is 'COMPLETE'
+                Response.Write("<script>alert('Profile saved successfully!');</script>");
             }
-
-            // Refresh page to reflect status
-            LoadProfileStatus();
-            pnlPrincipalInfo.Visible = false;
+            catch (Exception ex)
+            {
+                // A better practice is to log the error and show a user-friendly message
+                // For example: lblErrorMessage.Text = "An error occurred while saving. Please try again.";
+                Response.Write("An error occurred: " + ex.Message);
+            }
         }
 
         protected void btnBack_Click(object sender, EventArgs e)
         {
-            if (Session["SchoolCode"] == null || Session["AuthToken"] == null)
+            if (Session["AuthToken"] == null)
             {
                 Response.Redirect("SchoolLogin.aspx");
                 return;
             }
-
             string token = Session["AuthToken"].ToString();
-
-            // ✅ pass token via query string
             Response.Redirect("SchoolDashboard.aspx?token=" + token);
-
-
         }
     }
 }

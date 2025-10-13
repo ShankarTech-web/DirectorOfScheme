@@ -1,6 +1,25 @@
 ﻿<%@ Page Title="School Profile" Language="C#" MasterPageFile="~/Main.Master" AutoEventWireup="true" CodeBehind="SchoolProfile.aspx.cs" Inherits="DirectorOfScheme.School.SchoolProfile" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+     <!--Image  Priview-->
+    <script type="text/javascript">
+        function previewImage() {
+            var fileUpload = document.getElementById('<%= fileuploadPrincipal.ClientID %>');
+        var imgStudent = document.getElementById('<%= imgPrincipal.ClientID %>');
+
+            if (fileUpload.files && fileUpload.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    imgStudent.src = e.target.result;
+                }
+
+                reader.readAsDataURL(fileUpload.files[0]);
+            }
+        }
+    </script>
+
+    <!-- Image  Priview-->
     <div class="container-fluid mt-2">
         <div class="row">
             <div class="col-md-12">
@@ -23,7 +42,7 @@
                 <label class="fw-bold">Profile Status:</label>
                 <br />
                 <asp:Label ID="lbProfileStatus" runat="server" CssClass="badge bg-warning text-dark"></asp:Label>
-            </div>
+        </div>
         </div>
 
         <!-- Principal Info Section -->
@@ -97,7 +116,26 @@
                         ErrorMessage="Address is required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
                 </div>
             </div>
-
+            <div class="row">
+                                        <div class="col-md-4 mx-auto text-center">
+                                            <label class="fw-bold">
+                                                Principal's/Headmaster's Photo & Signature:
+                                            </label>
+                                            <span style="color: red;">*</span>
+                                            <asp:Image ID="imgPrincipal" runat="server" Width="150" Height="150" BorderColor="Black" />
+                                            <br />
+                                            <br />
+                                            <asp:FileUpload ID="fileuploadPrincipal" runat="server" CssClass="form-control" onchange="previewImage();" />
+                                            <asp:RequiredFieldValidator ID="validPriPhoto" runat="server" ControlToValidate="fileuploadPrincipal" ErrorMessage="Photo is Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-10 mx-auto">
+                                            <p class="text-primary fw-bold text-center">Only JPG, JPEG, and PNG formats are allowed.File size must be 100 KB or less.</p>
+                                        </div>
+                                    </div>
+                                
+                      
             <div class="text-end">
                 <asp:Button ID="btnSavePrincipal" runat="server" Text="Save Principal Info"
                     CssClass="btn btn-primary" OnClick="btnSavePrincipal_Click" />
