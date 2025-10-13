@@ -79,5 +79,20 @@ namespace DirectorOfScheme.School
             // ✅ pass token via query string
             Response.Redirect("SchoolProfile.aspx?token=" + token);
         }
+
+        protected void lbApplTrack_Click(object sender, EventArgs e)
+        {
+
+            if (Session["SchoolCode"] == null || Session["AuthToken"] == null)
+            {
+                Response.Redirect("SchoolLogin.aspx");
+                return;
+            }
+
+            string token = Session["AuthToken"].ToString();
+
+            // ✅ pass token via query string
+            Response.Redirect("../Scheme/TrackApplication.aspx?token=" + token);
+        }
     }
 }

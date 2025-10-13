@@ -18,8 +18,8 @@
             <hr class="border border-danger border-1 opacity-50">
         <!-- Dashboard Links -->
         <div class="row text-center mb-4">
-                        <div class="col-md-1"></div>
-            <div class="col-md-5">
+                        
+            <div class="col-md-4">
                 <div class="card shadow-sm p-3">
                    <asp:LinkButton ID="lbSchoolProfile" runat="server" CssClass="text-decoration-none" OnClick="lbSchoolProfile_Click">
                         <h5 class="fw-bold"> School Profile</h5>
@@ -29,7 +29,7 @@
                 </div>
             </div>
 
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <div class="card shadow-sm p-3">
                     <asp:LinkButton ID="lbRGScheme" runat="server" CssClass="text-decoration-none" OnClick="lbRGScheme_Click">
                         <h5 class="fw-bold">Apply Now</h5>
@@ -40,8 +40,15 @@
                   
                 </div>
             </div>
-            <div class="col-md-1"></div>
-            </div>
+                <div class="col-md-4">
+    <div class="card shadow-sm p-3">
+                           <asp:LinkButton ID="lbApplTrack" runat="server" CssClass="text-decoration-none" OnClick="lbApplTrack_Click">
+                       <h5 class="fw-bold">Track Application's</h5>
+<p>राजीव गांधी विद्यार्थी अपघात सानुग्रह अनुदान योजना अर्ज ट्रॅकिंग</p>
+        </asp:LinkButton>
+        </div>
+                    </div>
+          </div>
            </div>
     
 </asp:Content>

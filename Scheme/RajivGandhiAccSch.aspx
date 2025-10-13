@@ -1,91 +1,139 @@
 ﻿<%@ Page Title="Application Form" Language="C#" MasterPageFile="~/Main.Master" AutoEventWireup="true" CodeBehind="RajivGandhiAccSch.aspx.cs" Inherits="DirectorOfScheme.Scheme.RajivGandhiAccSch" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
+<div class="container-fluid mt-2">
 
-    <div class="container-fluid mt-2">
-        <div class="row text-center">
-            <div class="col-md-6">
-                <label class="fw-bold">School Udise Number:</label>
-                <asp:Label ID="lblUdise" runat="server" CssClass="form-control-plaintext text-danger"></asp:Label><br />
-            </div>
-            <div class="col-md-6">
-                <label class="fw-bold">School Name:</label>
-                <asp:Label ID="lblSchoolName" runat="server" CssClass="form-control-plaintext text-danger"></asp:Label><br />
-                </div>
+    <!-- School Details -->
+    <div class="row text-center">
+        <div class="col-md-6">
+            <label class="fw-bold">School Udise Number:</label>
+            <asp:Label ID="lblUdise" runat="server" CssClass="form-control-plaintext text-danger"></asp:Label>
         </div>
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <h4>Student Accident Application Form</h4>
-
-            </div>
+        <div class="col-md-6">
+            <label class="fw-bold">School Name:</label>
+            <asp:Label ID="lblSchoolName" runat="server" CssClass="form-control-plaintext text-danger"></asp:Label>
         </div>
-        <hr />
-        <div class="row">
-            <div class="col-md-4">
-                <label class="fw-bold">Student Full Name:</label>
-                <asp:TextBox ID="txtFullName" runat="server" CssClass="form-control" Placeholder="Full Name"></asp:TextBox><br />
+    </div>
 
-            </div>
-            <div class="col-md-4">
-                 <label class="fw-bold">Student Age:</label>
-                <asp:TextBox ID="txtAge" runat="server" CssClass="form-control" Placeholder="Age"></asp:TextBox><br />
-
-      </div>
-            <div class="col-md-4">
-                   <label class="fw-bold">Student Standard:</label>
-                <asp:TextBox ID="txtStandard" runat="server" CssClass="form-control" Placeholder="Standard (1-12)"></asp:TextBox><br />
-
-            </div>
+    <!-- Application ID -->
+    <div class="row mt-2 text-center">
+        <div class="col-md-12">
+            <label class="fw-bold">Application ID:</label>
+            <asp:Label ID="lblApplicationID" runat="server" CssClass="form-control-plaintext text-success"></asp:Label>
         </div>
-        <hr />
-        <div class="row">
-            <div class="col-md-1"></div>
-            <div class="col-md-5">
-                  <label class="fw-bold">Student District:</label>
-                <asp:TextBox ID="txtSchool" runat="server" CssClass="form-control" Placeholder="District Name"></asp:TextBox><br />
+    </div>
 
-            </div>
-            <div class="col-md-5">
-                 <label class="fw-bold">Student Taulka:</label>
-                <asp:TextBox ID="txtDistrict" runat="server" CssClass="form-control" Placeholder="Taluka"></asp:TextBox><br />
+    <!-- Form Header -->
+    <div class="row mt-2">
+        <div class="col-md-12 text-center">
+            <h4>Student Accident Application Form</h4>
+        </div>
+    </div>
+    <hr />
 
-            </div>
-            <div class="col-md-1"></div>
+    <!-- Student Details -->
+    <div class="row">
+        <div class="col-md-4">
+            <label class="fw-bold">Student Full Name:</label>
+            <asp:TextBox ID="txtFullName" runat="server" CssClass="form-control" Placeholder="Full Name"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="rfvName" runat="server"  ControlToValidate="txtFullName" ErrorMessage="* Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
         </div>
 
-        <div class="row">
-            <div class="col-md-5 mx-auto">
-                <label class="fw-bold">Application Type:</label>
-              <asp:DropDownList ID="ddlAccidentType" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlAccidentType_SelectedIndexChanged">
-    <asp:ListItem Text="-- Select Accident Type --" Value=""></asp:ListItem>
-    <asp:ListItem Text="Accidental Death" Value="Death"></asp:ListItem>
-    <asp:ListItem Text="Permanent Disability - Two Organs/Eyes" Value="DisabilityFull"></asp:ListItem>
-    <asp:ListItem Text="Permanent Disability - One Organ/Eye" Value="DisabilityPartial"></asp:ListItem>
-    <asp:ListItem Text="Surgery Due to Accident" Value="Surgery"></asp:ListItem>
-    <asp:ListItem Text="Injury (Sports, Fire, Electric Shock etc)" Value="Injury"></asp:ListItem>
-</asp:DropDownList><br /><br />
-            </div>
-        </div>
+        <div class="col-md-4">
+            <label class="fw-bold">Student Age:</label>
+            <asp:TextBox ID="txtAge" runat="server" CssClass="form-control" Placeholder="Age"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="rfvAge" runat="server" ControlToValidate="txtAge" ErrorMessage="* Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
         </div>
 
+        <div class="col-md-4">
+            <label class="fw-bold">Student Standard:</label>
+            <asp:DropDownList ID="ddlStandard" runat="server" CssClass="form-select">
+                <asp:ListItem Text="Select Standard" Value="0"></asp:ListItem>
+                <asp:ListItem Text="1" Value="1"></asp:ListItem>
+                <asp:ListItem Text="2" Value="2"></asp:ListItem>
+                <asp:ListItem Text="3" Value="3"></asp:ListItem>
+                <asp:ListItem Text="4" Value="4"></asp:ListItem>
+                <asp:ListItem Text="5" Value="5"></asp:ListItem>
+                <asp:ListItem Text="6" Value="6"></asp:ListItem>
+                <asp:ListItem Text="7" Value="7"></asp:ListItem>
+                <asp:ListItem Text="8" Value="8"></asp:ListItem>
+                <asp:ListItem Text="9" Value="9"></asp:ListItem>
+                <asp:ListItem Text="10" Value="10"></asp:ListItem>
+                <asp:ListItem Text="11" Value="11"></asp:ListItem>
+                <asp:ListItem Text="12" Value="12"></asp:ListItem>
+            </asp:DropDownList>
+            <asp:RequiredFieldValidator ID="rfvStandard" runat="server" ControlToValidate="ddlStandard" InitialValue="0" ErrorMessage="Standard is Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+        </div>
+    </div>
+    <hr />
 
+    <!-- District / Taluka -->
+    <div class="row">
+        <div class="col-md-5">
+            <label class="fw-bold">Student District:</label>
+            <asp:TextBox ID="txtSchool" runat="server" CssClass="form-control" Placeholder="District Name"></asp:TextBox>
+        </div>
+        <div class="col-md-5">
+            <label class="fw-bold">Student Taluka:</label>
+            <asp:TextBox ID="txtDistrict" runat="server" CssClass="form-control" Placeholder="Taluka"></asp:TextBox>
+        </div>
+    </div>
+    <hr />
 
+    <!-- Accident Type -->
+    <div class="row">
+        <div class="col-md-5 mx-auto">
+            <asp:DropDownList ID="ddlAccidentType" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlAccidentType_SelectedIndexChanged">
+                <asp:ListItem Text="-- Select Accident Type --" Value=""></asp:ListItem>
+                <asp:ListItem Text="Accidental Death" Value="Death"></asp:ListItem>
+                <asp:ListItem Text="Permanent Disability - Two Organs/Eyes" Value="DisabilityFull"></asp:ListItem>
+                <asp:ListItem Text="Permanent Disability - One Organ/Eye" Value="DisabilityPartial"></asp:ListItem>
+                <asp:ListItem Text="Surgery Due to Accident" Value="Surgery"></asp:ListItem>
+                <asp:ListItem Text="Injury (Sports, Fire, Electric Shock etc)" Value="Injury"></asp:ListItem>
+            </asp:DropDownList>
+            <asp:RequiredFieldValidator ID="rfvAccidentType" runat="server" ControlToValidate="ddlAccidentType"
+                InitialValue="" ErrorMessage="* Please select Accident Type" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+        </div>
+    </div>
 
+    <!-- Required Documents -->
+    <asp:GridView ID="gvDocuments" runat="server" AutoGenerateColumns="false" CssClass="table table-bordered mt-2">
+        <Columns>
+            <asp:BoundField DataField="DocumentName" HeaderText="Required Document" />
+            <asp:TemplateField HeaderText="Upload">
+                <ItemTemplate>
+                    <asp:FileUpload ID="fuDoc" runat="server" />
+                </ItemTemplate>
+            </asp:TemplateField>
+        </Columns>
+    </asp:GridView>
 
+    <!-- Submit / Back -->
+    <asp:Button ID="btnSubmit" runat="server" Text="Submit Application" CssClass="btn btn-success mt-2" OnClick="btnSubmit_Click" />
+    <asp:Label ID="lblMessage" runat="server" CssClass="d-block mt-2"></asp:Label>
+    <asp:Button ID="btnBack" runat="server" Text="Back to Dashboard" CssClass="btn btn-danger mt-2" OnClick="btnBack_Click" />
 
+    <!-- Application Tracking -->
+    <hr />
+    <div class="row">
+        <div class="col-md-6 mx-auto text-center">
+            <h5>Track Your Application</h5>
+            <asp:TextBox ID="txtTrackID" runat="server" CssClass="form-control mb-2" Placeholder="Enter Application ID"></asp:TextBox>
+            <asp:Button ID="btnTrack" runat="server" CssClass="btn btn-primary mb-2" Text="Track Application" OnClick="btnTrack_Click" />
+            <asp:Label ID="lblTrackMessage" runat="server" CssClass="d-block mt-2"></asp:Label>
 
-<asp:GridView ID="gvDocuments" runat="server" AutoGenerateColumns="false" CssClass="table table-bordered">
-    <Columns>
-        <asp:BoundField DataField="DocumentName" HeaderText="Required Document" />
-        <asp:TemplateField HeaderText="Upload">
-            <ItemTemplate>
-                <asp:FileUpload ID="fuDoc" runat="server" />
-            </ItemTemplate>
-        </asp:TemplateField>
-    </Columns>
-</asp:GridView>
+            <asp:GridView ID="gvTrackDetails" runat="server" AutoGenerateColumns="false" CssClass="table table-bordered mt-2">
+                <Columns>
+                    <asp:BoundField DataField="FullName" HeaderText="Student Name" />
+                    <asp:BoundField DataField="Standard" HeaderText="Standard" />
+                    <asp:BoundField DataField="AccidentType" HeaderText="Accident Type" />
+                    <asp:BoundField DataField="ApplicationID" HeaderText="Application ID" />
+                    <asp:BoundField DataField="AccidentDate" HeaderText="Date Submitted" DataFormatString="{0:dd/MM/yyyy}" />
+                    <asp:BoundField DataField="Status" HeaderText="Application Status" />
+                </Columns>
+            </asp:GridView>
+        </div>
+    </div>
 
-<asp:Button ID="btnSubmit" runat="server" Text="Submit Application" CssClass="btn btn-success" OnClick="btnSubmit_Click" />
-<asp:Label ID="lblMessage" runat="server" CssClass="mt-2 d-block"></asp:Label>
-<asp:Button ID="btnBack" runat="server" Text="Back to Dashboard" CssClass="btn btn-danger mt-2" OnClick="btnBack_Click" />
+</div>
 </asp:Content>

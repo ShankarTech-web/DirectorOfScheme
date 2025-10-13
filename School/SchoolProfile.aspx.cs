@@ -164,10 +164,10 @@ namespace DirectorOfScheme.School
                         // INSERT new record
                         query = @"INSERT INTO SchoolPrincipal 
                                     (SchoolCode, PrincipalName, PrincipalMobile, PrincipalEmail, PrincipalAddress, 
-                                    PrincipalDOB, PrincipalQualification, StartDate, EndDate, PrincipalPhoto)
+                                    PrincipalDOB, PrincipalQualification, StartDate, EndDate, FilePath)
                                   VALUES 
                                     (@SchoolCode, @PrincipalName, @PrincipalMobile, @PrincipalEmail, @PrincipalAddress, 
-                                    @PrincipalDOB, @PrincipalQualification, @StartDate, @EndDate, @PrincipalPhoto)";
+                                    @PrincipalDOB, @PrincipalQualification, @StartDate, @EndDate, @FilePath)";
                     }
 
                     SqlCommand cmd = new SqlCommand(query, con);
@@ -186,12 +186,12 @@ namespace DirectorOfScheme.School
                     // Add photo path parameter
                     if (principalPhotoPath != null)
                     {
-                        cmd.Parameters.AddWithValue("@PrincipalPhoto", principalPhotoPath);
+                        cmd.Parameters.AddWithValue("@FilePath", principalPhotoPath);
                     }
                     else if (existingRecords == 0)
                     {
                         // If inserting new record and no photo, pass NULL
-                        cmd.Parameters.AddWithValue("@PrincipalPhoto", DBNull.Value);
+                        cmd.Parameters.AddWithValue("@FilePath", DBNull.Value);
                     }
 
                     cmd.ExecuteNonQuery();
