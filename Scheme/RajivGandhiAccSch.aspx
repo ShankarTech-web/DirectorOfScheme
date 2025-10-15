@@ -71,11 +71,13 @@
     <div class="row">
         <div class="col-md-5">
             <label class="fw-bold">Student District:</label>
-            <asp:TextBox ID="txtSchool" runat="server" CssClass="form-control" Placeholder="District Name"></asp:TextBox>
+             <asp:DropDownList ID="ddldist" runat="server" AutoPostBack="true" CssClass="form-control" OnSelectedIndexChanged="ddldist_SelectedIndexChanged"></asp:DropDownList>
+           <asp:RequiredFieldValidator ID="rfvDDLDist" runat="server" ControlToValidate="ddldist" ForeColor="Red" ErrorMessage="* Required" Display="Dynamic" InitialValue="-1"></asp:RequiredFieldValidator>
         </div>
         <div class="col-md-5">
             <label class="fw-bold">Student Taluka:</label>
-            <asp:TextBox ID="txtDistrict" runat="server" CssClass="form-control" Placeholder="Taluka"></asp:TextBox>
+             <asp:DropDownList ID="ddltaluka" runat="server" CssClass="form-control"></asp:DropDownList>
+            
         </div>
     </div>
     <hr />
@@ -111,29 +113,11 @@
     <!-- Submit / Back -->
     <asp:Button ID="btnSubmit" runat="server" Text="Submit Application" CssClass="btn btn-success mt-2" OnClick="btnSubmit_Click" />
     <asp:Label ID="lblMessage" runat="server" CssClass="d-block mt-2"></asp:Label>
-    <asp:Button ID="btnBack" runat="server" Text="Back to Dashboard" CssClass="btn btn-danger mt-2" OnClick="btnBack_Click" />
+    <asp:Button ID="btnBack" runat="server" Text="Back to Dashboard" CssClass="btn btn-danger mt-2" OnClick="btnBack_Click" CausesValidation="false" />
 
     <!-- Application Tracking -->
     <hr />
-    <div class="row">
-        <div class="col-md-6 mx-auto text-center">
-            <h5>Track Your Application</h5>
-            <asp:TextBox ID="txtTrackID" runat="server" CssClass="form-control mb-2" Placeholder="Enter Application ID"></asp:TextBox>
-            <asp:Button ID="btnTrack" runat="server" CssClass="btn btn-primary mb-2" Text="Track Application" OnClick="btnTrack_Click" />
-            <asp:Label ID="lblTrackMessage" runat="server" CssClass="d-block mt-2"></asp:Label>
-
-            <asp:GridView ID="gvTrackDetails" runat="server" AutoGenerateColumns="false" CssClass="table table-bordered mt-2">
-                <Columns>
-                    <asp:BoundField DataField="FullName" HeaderText="Student Name" />
-                    <asp:BoundField DataField="Standard" HeaderText="Standard" />
-                    <asp:BoundField DataField="AccidentType" HeaderText="Accident Type" />
-                    <asp:BoundField DataField="ApplicationID" HeaderText="Application ID" />
-                    <asp:BoundField DataField="AccidentDate" HeaderText="Date Submitted" DataFormatString="{0:dd/MM/yyyy}" />
-                    <asp:BoundField DataField="Status" HeaderText="Application Status" />
-                </Columns>
-            </asp:GridView>
-        </div>
-    </div>
+    
 
 </div>
 </asp:Content>

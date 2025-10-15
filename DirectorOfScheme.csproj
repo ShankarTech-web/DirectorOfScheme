@@ -70,6 +70,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scheme\Districts.xml" />
     <Content Include="DocumentsSection.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Homepage.aspx" />
@@ -88,10 +89,12 @@
     <Content Include="Images\NATIONALA.png" />
     <Content Include="LoginPage.aspx" />
     <Content Include="Scheme\RajivGandhiAccSch.aspx" />
+    <Content Include="Scheme\RGSchemeApplicationForm.aspx" />
     <Content Include="Scheme\TrackApplication.aspx" />
     <Content Include="School\SchoolDashboard.aspx" />
     <Content Include="School\SchoolLogin.aspx" />
     <Content Include="School\SchoolProfile.aspx" />
+    <Content Include="Scheme\Taluka.xml" />
     <Content Include="ViewSwitcher.ascx" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -137,6 +140,13 @@
     </Compile>
     <Compile Include="Scheme\RajivGandhiAccSch.aspx.designer.cs">
       <DependentUpon>RajivGandhiAccSch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Scheme\RGSchemeApplicationForm.aspx.cs">
+      <DependentUpon>RGSchemeApplicationForm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Scheme\RGSchemeApplicationForm.aspx.designer.cs">
+      <DependentUpon>RGSchemeApplicationForm.aspx</DependentUpon>
     </Compile>
     <Compile Include="Scheme\TrackApplication.aspx.cs">
       <DependentUpon>TrackApplication.aspx</DependentUpon>
@@ -188,6 +198,7 @@
     <Content Include="GR%27s\21June2022GR.pdf" />
     <None Include="packages.config" />
     <Content Include="Site.Mobile.Master" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\FTPProfile.pubxml" />
     <None Include="Properties\PublishProfiles\FTPProfile1.pubxml" />
     <None Include="Properties\PublishProfiles\site36727-WebDeploy.pubxml" />

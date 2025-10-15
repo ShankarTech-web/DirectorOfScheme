@@ -8,13 +8,14 @@ namespace DirectorOfScheme.Scheme
 {
     public partial class RajivGandhiAccSch : System.Web.UI.Page
     {
-        string conStr = ConfigurationManager.ConnectionStrings["connectionDB"].ConnectionString;
+        private readonly string conStr = ConfigurationManager.ConnectionStrings["connectionDB"].ConnectionString;
         private string applicationID;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
+                // 🔒 Validate token
                 string sessionToken = Session["AuthToken"] as string;
                 string queryToken = Request.QueryString["token"];
 
@@ -24,12 +25,16 @@ namespace DirectorOfScheme.Scheme
                     return;
                 }
 
-                lblUdise.Text = Session["SchoolCode"].ToString();
-                lblSchoolName.Text = Session["schoolName"].ToString();
+                // 🏫 Display school info
+                lblUdise.Text = Session["SchoolCode"]?.ToString();
+                lblSchoolName.Text = Session["schoolName"]?.ToString();
 
-                // Generate Application ID on page load
-                applicationID = GenerateApplicationID();
+                // 🧾 Generate Application ID
+                applicationID = GetNewApplicationID();
                 lblApplicationID.Text = applicationID;
+
+                // Load district dropdown
+                LoadDistricts();
             }
             else
             {
@@ -37,6 +42,22 @@ namespace DirectorOfScheme.Scheme
             }
         }
 
+        // 🏙 Load Districts from XML
+        private void LoadDistricts()
+        {
+            DataSet dsDistrict = new DataSet();
+            dsDistrict.ReadXml(Server.MapPath("Districts.xml"));
+
+            ddldist.DataSource = dsDistrict;
+            ddldist.DataTextField = "DistrictName";
+            ddldist.DataValueField = "DistrictId";
+            ddldist.DataBind();
+
+            ddldist.Items.Insert(0, new ListItem("---Select District---", "-1"));
+            ddltaluka.Items.Insert(0, new ListItem("---Select Taluka---", "-1"));
+        }
+
+        // 📑 Populate required documents based on Accident Type
         protected void ddlAccidentType_SelectedIndexChanged(object sender, EventArgs e)
         {
             using (SqlConnection con = new SqlConnection(conStr))
@@ -49,14 +70,57 @@ namespace DirectorOfScheme.Scheme
                 da.Fill(dt);
 
                 gvDocuments.DataSource = dt;
-                gvDocuments.DataKeyNames = new string[] { "DocumentID" };
+                gvDocuments.DataKeyNames = new[] { "DocumentID" };
                 gvDocuments.DataBind();
             }
         }
 
+        // 🧾 Generate New Application ID (Format: DES-MHYYYY0001)
+        private string GetNewApplicationID()
+        {
+            using (SqlConnection con = new SqlConnection(conStr))
+            {
+                con.Open();
+
+                int currentYear = DateTime.Now.Year;
+                int nextNumber = 1;
+                string prefix = $"DES-MH{currentYear}";
+
+                // Get last ApplicationID of current year
+                string query = @"
+                    SELECT TOP 1 ApplicationID 
+                    FROM AccidentDetails 
+                    WHERE ApplicationID LIKE @prefix + '%' 
+                    ORDER BY ApplicationID DESC";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@prefix", prefix);
+
+                object result = cmd.ExecuteScalar();
+
+                if (result != null && result != DBNull.Value)
+                {
+                    string lastId = result.ToString(); // e.g. DES-MH20250012
+                    string lastNumPart = lastId.Substring(prefix.Length); // e.g. "0012"
+
+                    if (int.TryParse(lastNumPart, out int lastNumber))
+                    {
+                        nextNumber = lastNumber + 1;
+                    }
+                }
+
+                // Return new ApplicationID (e.g. DES-MH20250013)
+                return $"{prefix}{nextNumber:D4}";
+            }
+        }
+
+        // 💾 Submit Application
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
-            // Validate document uploads
+            // 🧾 Get fresh Application ID to ensure uniqueness
+            applicationID = GetNewApplicationID();
+
+            // ⚠️ Validate uploads
             foreach (GridViewRow row in gvDocuments.Rows)
             {
                 FileUpload fu = (FileUpload)row.FindControl("fuDoc");
@@ -74,42 +138,51 @@ namespace DirectorOfScheme.Scheme
             {
                 con.Open();
 
-                // Insert Student
+                // 🔹 Insert Student Info
                 SqlCommand cmd = new SqlCommand(
-                    "INSERT INTO Students (FullName, Age, Standard, SchoolName, District) " +
-                    "VALUES (@FullName,@Age,@Standard,@SchoolName,@District); SELECT SCOPE_IDENTITY();", con);
-                cmd.Parameters.AddWithValue("@FullName", txtFullName.Text);
+                    @"INSERT INTO Students (FullName, Age, Standard, SchoolName, District) 
+                      VALUES (@FullName, @Age, @Standard, @SchoolName, @District); 
+                      SELECT SCOPE_IDENTITY();", con);
+
+                cmd.Parameters.AddWithValue("@FullName", txtFullName.Text.Trim());
                 cmd.Parameters.AddWithValue("@Age", int.Parse(txtAge.Text));
                 cmd.Parameters.AddWithValue("@Standard", int.Parse(ddlStandard.SelectedValue));
-                cmd.Parameters.AddWithValue("@SchoolName", txtSchool.Text);
-                cmd.Parameters.AddWithValue("@District", txtDistrict.Text);
+                cmd.Parameters.AddWithValue("@SchoolName", lblSchoolName.Text.Trim());
+                cmd.Parameters.AddWithValue("@District", ddldist.SelectedItem.Text.Trim());
+
                 studentID = Convert.ToInt32(cmd.ExecuteScalar());
 
-                // Insert Accident
+                // 🔹 Insert Accident Details
                 SqlCommand cmdAccident = new SqlCommand(
-                    "INSERT INTO AccidentDetails (StudentID, AccidentDate, AccidentType, HospitalName, ExpenseAmount, IsEligible, ApplicationID) " +
-                    "VALUES (@StudentID,@AccidentDate,@AccidentType,@HospitalName,@Expense,1,@ApplicationID); SELECT SCOPE_IDENTITY();", con);
+                    @"INSERT INTO AccidentDetails 
+                      (StudentID, AccidentDate, AccidentType, HospitalName, ExpenseAmount, IsEligible, ApplicationID)
+                      VALUES (@StudentID, @AccidentDate, @AccidentType, @HospitalName, @ExpenseAmount, 1, @ApplicationID);
+                      SELECT SCOPE_IDENTITY();", con);
+
                 cmdAccident.Parameters.AddWithValue("@StudentID", studentID);
                 cmdAccident.Parameters.AddWithValue("@AccidentDate", DateTime.Now);
                 cmdAccident.Parameters.AddWithValue("@AccidentType", ddlAccidentType.SelectedValue);
                 cmdAccident.Parameters.AddWithValue("@HospitalName", "NA");
-                cmdAccident.Parameters.AddWithValue("@Expense", 0);
+                cmdAccident.Parameters.AddWithValue("@ExpenseAmount", 0);
                 cmdAccident.Parameters.AddWithValue("@ApplicationID", applicationID);
+
                 accidentID = Convert.ToInt32(cmdAccident.ExecuteScalar());
 
-                // Save uploaded documents with ApplicationID
+                // 🔹 Save Uploaded Documents
                 foreach (GridViewRow row in gvDocuments.Rows)
                 {
                     FileUpload fu = (FileUpload)row.FindControl("fuDoc");
                     if (fu != null && fu.HasFile)
                     {
                         string ext = System.IO.Path.GetExtension(fu.FileName);
-                        string fileName = applicationID + fu.ID.ToLower() + ext;
+                        string fileName = $"{applicationID}_{gvDocuments.DataKeys[row.RowIndex].Value}{ext}";
                         string filePath = Server.MapPath("~/Uploads/") + fileName;
                         fu.SaveAs(filePath);
 
                         SqlCommand cmdDoc = new SqlCommand(
-                            "INSERT INTO UploadedDocuments (AccidentID, DocumentID, FilePath) VALUES (@AccidentID,@DocumentID,@FilePath)", con);
+                            @"INSERT INTO UploadedDocuments (AccidentID, DocumentID, FilePath) 
+                              VALUES (@AccidentID, @DocumentID, @FilePath)", con);
+
                         cmdDoc.Parameters.AddWithValue("@AccidentID", accidentID);
                         cmdDoc.Parameters.AddWithValue("@DocumentID", gvDocuments.DataKeys[row.RowIndex].Value);
                         cmdDoc.Parameters.AddWithValue("@FilePath", "~/Uploads/" + fileName);
@@ -118,17 +191,12 @@ namespace DirectorOfScheme.Scheme
                 }
             }
 
+            // ✅ Success Message
             lblMessage.Text = $"✅ Application Submitted Successfully!<br/>📄 Your Application ID: <b>{applicationID}</b>";
             lblMessage.ForeColor = System.Drawing.Color.Green;
         }
 
-        private string GenerateApplicationID()
-        {
-            Random rnd = new Random();
-            string randomNum = rnd.Next(1000, 9999).ToString();
-            return "RG" + DateTime.Now.ToString("yyyyMMdd") + randomNum;
-        }
-
+        // ↩️ Back Button
         protected void btnBack_Click(object sender, EventArgs e)
         {
             if (Session["SchoolCode"] == null || Session["AuthToken"] == null)
@@ -136,53 +204,40 @@ namespace DirectorOfScheme.Scheme
                 Response.Redirect("../School/SchoolLogin.aspx");
                 return;
             }
+
             string token = Session["AuthToken"].ToString();
             Response.Redirect("../School/SchoolDashboard.aspx?token=" + token);
         }
 
-        // Application Tracking
-        protected void btnTrack_Click(object sender, EventArgs e)
+        // 🌐 Load Talukas based on District
+        protected void ddldist_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string appID = txtTrackID.Text.Trim();
-            if (string.IsNullOrEmpty(appID))
+            string selectedDistrictId = ddldist.SelectedValue;
+
+            if (!string.IsNullOrEmpty(selectedDistrictId) && selectedDistrictId != "-1")
             {
-                lblTrackMessage.Text = "⚠️ Please enter Application ID.";
-                lblTrackMessage.ForeColor = System.Drawing.Color.Red;
-                gvTrackDetails.DataSource = null;
-                gvTrackDetails.DataBind();
-                return;
+                DataSet dsTaluka = new DataSet();
+                dsTaluka.ReadXml(Server.MapPath("Taluka.xml"));
+
+                DataTable talukaTable = dsTaluka.Tables["Taluka"];
+                DataTable filteredTalukas = talukaTable.Clone();
+
+                foreach (DataRow row in talukaTable.Rows)
+                {
+                    if (row["DistrictId"].ToString() == selectedDistrictId)
+                        filteredTalukas.ImportRow(row);
+                }
+
+                ddltaluka.DataSource = filteredTalukas;
+                ddltaluka.DataTextField = "TalukaName";
+                ddltaluka.DataValueField = "TalukaId";
+                ddltaluka.DataBind();
+                ddltaluka.Items.Insert(0, new ListItem("---Select Taluka---", "-1"));
             }
-
-            using (SqlConnection con = new SqlConnection(conStr))
+            else
             {
-                string query = @"
-                    SELECT s.FullName, s.Standard, a.AccidentType, a.ApplicationID, a.AccidentDate,
-                           CASE WHEN a.IsEligible = 1 THEN 'Approved' ELSE 'Pending' END AS Status
-                    FROM Students s
-                    INNER JOIN AccidentDetails a ON s.StudentID = a.StudentID
-                    WHERE a.ApplicationID = @ApplicationID";
-
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@ApplicationID", appID);
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                if (dt.Rows.Count > 0)
-                {
-                    gvTrackDetails.DataSource = dt;
-                    gvTrackDetails.DataBind();
-                    lblTrackMessage.Text = $"🔍 Details for Application ID: {appID}";
-                    lblTrackMessage.ForeColor = System.Drawing.Color.Green;
-                }
-                else
-                {
-                    gvTrackDetails.DataSource = null;
-                    gvTrackDetails.DataBind();
-                    lblTrackMessage.Text = $"❌ No application found with ID: {appID}";
-                    lblTrackMessage.ForeColor = System.Drawing.Color.Red;
-                }
+                ddltaluka.Items.Clear();
+                ddltaluka.Items.Insert(0, new ListItem("---Select Taluka---", "-1"));
             }
         }
     }

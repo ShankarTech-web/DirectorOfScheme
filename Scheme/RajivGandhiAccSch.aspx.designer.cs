@@ -96,22 +96,31 @@ namespace DirectorOfScheme.Scheme
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvStandard;
 
         /// <summary>
-        /// txtSchool control.
+        /// ddldist control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtSchool;
+        protected global::System.Web.UI.WebControls.DropDownList ddldist;
 
         /// <summary>
-        /// txtDistrict control.
+        /// rfvDDLDist control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtDistrict;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvDDLDist;
+
+        /// <summary>
+        /// ddltaluka control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddltaluka;
 
         /// <summary>
         /// ddlAccidentType control.
@@ -166,41 +175,5 @@ namespace DirectorOfScheme.Scheme
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnBack;
-
-        /// <summary>
-        /// txtTrackID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtTrackID;
-
-        /// <summary>
-        /// btnTrack control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnTrack;
-
-        /// <summary>
-        /// lblTrackMessage control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTrackMessage;
-
-        /// <summary>
-        /// gvTrackDetails control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvTrackDetails;
     }
 }
