@@ -68,10 +68,50 @@
             </div>
             <div class="col-md-4">
                 <label class="fw-bold">अर्जदाराची इयत्ता:</label>
-                <asp:TextBox ID="txtStandard" runat="server" CssClass="foem-control" ToolTip="अर्जदाराची इयत्ता" placeholder="अर्जदाराची इयत्ता"></asp:TextBox>
+               <asp:DropDownList ID="ddlStandard" runat="server" CssClass="form-select">
+     <asp:ListItem Text="इयत्ता निवडा " Value="0"></asp:ListItem>
+     <asp:ListItem Text="इ.१ ली" Value="1"></asp:ListItem>
+     <asp:ListItem Text="इ.२ री" Value="2"></asp:ListItem>
+     <asp:ListItem Text="इ.३ री" Value="3"></asp:ListItem>
+     <asp:ListItem Text="इ.४ थी" Value="4"></asp:ListItem>
+     <asp:ListItem Text="इ.५ वी" Value="5"></asp:ListItem>
+     <asp:ListItem Text="इ.६ वी" Value="6"></asp:ListItem>
+     <asp:ListItem Text="इ.७ वी" Value="7"></asp:ListItem>
+     <asp:ListItem Text="इ.८ वी" Value="8"></asp:ListItem>
+     <asp:ListItem Text="इ.९ वी" Value="9"></asp:ListItem>
+     <asp:ListItem Text="इ.१० वी" Value="10"></asp:ListItem>
+     <asp:ListItem Text="इ.११ वी" Value="11"></asp:ListItem>
+     <asp:ListItem Text="इ.१२ वी" Value="12"></asp:ListItem>
+ </asp:DropDownList>
+ <asp:RequiredFieldValidator ID="rfvStandard" runat="server" ControlToValidate="ddlStandard" InitialValue="0" ErrorMessage="Standard is Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+        
+               
             </div>
         </div>
+        
         <!--Row Four-->
+        <br />
+        <!--Row Five-->
+        <div class="row">
+            <div class="col-md-4">
+                <label class="fw-bold">
+                    अर्जदाराचे जिल्हा: 
+                </label>
+                  <asp:DropDownList ID="ddldist" runat="server" AutoPostBack="true" CssClass="form-control" OnSelectedIndexChanged="ddldist_SelectedIndexChanged"></asp:DropDownList>
+<asp:RequiredFieldValidator ID="rfvDDLDist" runat="server" ControlToValidate="ddldist" ForeColor="Red" ErrorMessage="* Required" Display="Dynamic" InitialValue="-1"></asp:RequiredFieldValidator>
+       
+            </div>
+            <div class="col-md-4">
+                <label class="fw-bold">अर्जदाराचे तालुका:</label>
+ <asp:DropDownList ID="ddltaluka" runat="server" CssClass="form-control"></asp:DropDownList>
+            
+            </div>
+            <div class="col-md-4">
+                <label class="fw-bold">अर्जदाराचे गाव:</label>
+                <asp:TextBox ID="txtVillage" runat="server" CssClass="form-control" ToolTip="अर्जदाराचे गाव" placeholder="अर्जदाराचे गाव"></asp:TextBox>
+            </div>
+        </div>
+        <!--Row Five-->
         </div>
 
      

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
@@ -20,6 +21,7 @@ namespace DirectorOfScheme.Scheme
                 // 🧾 Generate Application ID
                 applicationID = GetNewApplicationID();
                 lblApplicationID.Text = applicationID;
+                LoadDistricts();
 
             }
         }
@@ -103,6 +105,50 @@ namespace DirectorOfScheme.Scheme
                     txtAge.Text = "Please enter a valid date.";
                     txtAge.ForeColor = System.Drawing.Color.Red;
                 }
+            }
+        }
+
+        private void LoadDistricts()
+        {
+            DataSet dsDistrict = new DataSet();
+            dsDistrict.ReadXml(Server.MapPath("Districts.xml"));
+
+            ddldist.DataSource = dsDistrict;
+            ddldist.DataTextField = "DistrictName";
+            ddldist.DataValueField = "DistrictId";
+            ddldist.DataBind();
+
+            ddldist.Items.Insert(0, new ListItem("---Select District---", "-1"));
+           // ddltaluka.Items.Insert(0, new ListItem("---Select Taluka---", "-1"));
+        }
+        protected void ddldist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectedDistrictId = ddldist.SelectedValue;
+
+            if (!string.IsNullOrEmpty(selectedDistrictId) && selectedDistrictId != "-1")
+            {
+                DataSet dsTaluka = new DataSet();
+                dsTaluka.ReadXml(Server.MapPath("Taluka.xml"));
+
+                DataTable talukaTable = dsTaluka.Tables["Taluka"];
+                DataTable filteredTalukas = talukaTable.Clone();
+
+                foreach (DataRow row in talukaTable.Rows)
+                {
+                    if (row["DistrictId"].ToString() == selectedDistrictId)
+                        filteredTalukas.ImportRow(row);
+                }
+
+                ddltaluka.DataSource = filteredTalukas;
+                ddltaluka.DataTextField = "TalukaName";
+                ddltaluka.DataValueField = "TalukaId";
+                ddltaluka.DataBind();
+                ddltaluka.Items.Insert(0, new ListItem("---Select Taluka---", "-1"));
+            }
+            else
+            {
+                ddltaluka.Items.Clear();
+                ddltaluka.Items.Insert(0, new ListItem("---Select Taluka---", "-1"));
             }
         }
     }
