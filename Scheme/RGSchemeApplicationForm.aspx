@@ -104,14 +104,25 @@
             <div class="col-md-4">
                 <label class="fw-bold">अर्जदाराचे तालुका:</label>
  <asp:DropDownList ID="ddltaluka" runat="server" CssClass="form-control"></asp:DropDownList>
+                <asp:RequiredFieldValidator ID="rfvTaluka" runat="server" ControlToValidate="ddltaluka" ForeColor="Red" ErrorMessage="* Required" Display="Dynamic" InitialValue="-1"></asp:RequiredFieldValidator>
             
             </div>
             <div class="col-md-4">
                 <label class="fw-bold">अर्जदाराचे गाव:</label>
                 <asp:TextBox ID="txtVillage" runat="server" CssClass="form-control" ToolTip="अर्जदाराचे गाव" placeholder="अर्जदाराचे गाव"></asp:TextBox>
+                <asp:RequiredFieldValidator ID="rfvVillage" runat="server" ControlToValidate="txtVillage" ForeColor="Red" ErrorMessage="* Required" Display="Dynamic"></asp:RequiredFieldValidator>
             </div>
         </div>
         <!--Row Five-->
+        <br />
+        <!--Row Six-->
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <label class="fw-bold">विद्यार्थ्यांचे शाळेचे नाव किंवा संस्थेचे नाव:</label>
+                <asp:TextBox ID="txtSchoolName" runat="server" CssClass="form-control" ToolTip="विद्यार्थ्यांचे शाळेचे नाव किंवा संस्थेचे नाव" placeholder="विद्यार्थ्यांचे शाळेचे नाव किंवा संस्थेचे नाव" Enabled="false" Visible="true"></asp:TextBox>
+            </div>
+        </div>
+        <!--Row Six-->
         </div>
 
      

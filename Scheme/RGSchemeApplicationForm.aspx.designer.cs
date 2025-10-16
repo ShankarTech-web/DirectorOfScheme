@@ -132,6 +132,15 @@ namespace DirectorOfScheme.Scheme
         protected global::System.Web.UI.WebControls.DropDownList ddltaluka;
 
         /// <summary>
+        /// rfvTaluka control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvTaluka;
+
+        /// <summary>
         /// txtVillage control.
         /// </summary>
         /// <remarks>
@@ -139,5 +148,23 @@ namespace DirectorOfScheme.Scheme
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtVillage;
+
+        /// <summary>
+        /// rfvVillage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvVillage;
+
+        /// <summary>
+        /// txtSchoolName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtSchoolName;
     }
 }
