@@ -172,7 +172,7 @@
     </div>
 
     <div class="hero-right">
-      <img class="rounded-image" src="Images/honDirector.jpeg" alt="Director of Education (Scheme)" />
+      <img class="rounded-image" src="Images/honDirector.jpeg" alt="Directorate of Education (Scheme)" />
       <div style="margin-top: .8rem; line-height: 1.6;">
         <b>श्री. कृष्णकुमार पाटील</b><br />
         संचालक<br />
@@ -183,7 +183,7 @@
   </section>
 
   <footer>
-    <small>Beta Version 0.9.7 | &copy; Director of Education (Scheme)</small>
+    <small>Beta Version 0.9.9 | &copy; Directorate of Education (Scheme)</small>
   </footer>
 </div>
 

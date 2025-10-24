@@ -1,6 +1,70 @@
 ﻿<%@ Page Title="Application Form" Language="C#" MasterPageFile="~/Main.Master" AutoEventWireup="true" CodeBehind="RGSchemeApplicationForm.aspx.cs" Inherits="DirectorOfScheme.Scheme.RGSchemeApplicationForm" EnableEventValidation="true"  %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-   
+<!-- ===== Fallback: datalist (simple, no jQuery UI required) ===== -->
+<!-- Label Validation-->
+   <%-- <script>
+        function validateForm() {
+            var hospital = $("#<%= txtHospitalName.ClientID %>").text().trim();
+        if (!hospital) {
+            alert("कृपया उपचार घेतलेल्या दवाखान्याचे नाव प्रविष्ट करा");
+            return false;
+        }
+        return true;
+    }
+    </script>--%>
+    
+
+    <!-- Label Validation-->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(function () {
+        var inputId = "#txtHospital_d";
+        var dataListId = "#hospList";
+        var handler = '<%= ResolveUrl("~/Handlers/GetHospitalName.ashx") %>';
+    var serverTextbox = "#<%= txtHospitalName.ClientID %>";
+
+    $(inputId).on('input', function () {
+        var term = $(this).val().trim();
+        if (!term) {
+            $(dataListId).empty();
+            $(serverTextbox).val('');
+            return;
+        }
+
+        $.ajax({
+            url: handler,
+            dataType: "json",
+            data: { term: term },
+            success: function (data) {
+                $(dataListId).empty();
+                if (data && data.length) {
+                    data.forEach(function (item) {
+                        $("<option>").attr("value", item).appendTo(dataListId);
+                    });
+                }
+            }
+        });
+
+        $(serverTextbox).val(term);
+    });
+
+    $(inputId).on('change blur', function () {
+        var val = $(this).val().trim();
+        $(serverTextbox).val(val);
+    });
+});
+</script>
+
+
+
+
+<!-- Important: keep your server-side txtHospitalName TextBox present (hidden or normal).
+     The above populates it so your existing button insert code reads the selected value. -->
+
+
 
     <div class="container-fluid mt-2">
          <!-- Row One-->
@@ -126,22 +190,168 @@
         <br />
         <!--Row Seven-->
         <div class="row">
-            <div class="col-md-4">
+                        <div class="col-md-4">
                 <label class="fw-bold">
-
+                    शाळेचा/संस्थेचा जिल्हा: 
                 </label>
+                <asp:TextBox ID="txtSchoolDist" runat="server" CssClass="form-control" ToolTip="शाळेचा/संस्थेचा जिल्हा" placeholder="शाळेचा/संस्थेचा जिल्हा" Visible="true" Enabled="false"></asp:TextBox>
             </div>
               <div class="col-md-4">
-      <label class="fw-bold"></label>
+      <label class="fw-bold">
+             शाळेचा/संस्थेचा तालुका:
+      </label>
+                  <asp:TextBox ID="txtSchoolTal" runat="server" CssClass="form-control" ToolTip="शाळेचा/संस्थेचा तालुका" placeholder="शाळेचा/संस्थेचा तालुका" Visible="true" Enabled="false"></asp:TextBox>
   </div>
               <div class="col-md-4">
-      <label class="fw-bold"></label>
+      <label class="fw-bold">
+       शाळेचे/संस्थेचे गाव (क्लस्टर):
+      </label>
+                  <asp:TextBox ID="txtSchoolVillage" runat="server" CssClass="form-control" ToolTip=" शाळेचे/संस्थेचे गाव (क्लस्टर)" placeholder=" शाळेचे/संस्थेचे गाव (क्लस्टर)" Visible="true" Enabled="false"></asp:TextBox>
   </div>
         </div>
         <!--Row Seven-->
-
+        <br />
+        <!--Row Eight-->
+        <div class="row">
+            <div class="col-md-12 mx-auto text-center">
+                <p class="fw-bold fs-4" style="font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">
+                    वैद्यकीय खर्च
+                </p>
+                <p class="fw-bold alert alert-danger" style="font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">
+                    टीप:एकापेक्षा अधिक दावाखान्यात उपचार घेतले असल्यास क्रमवारी नुसार खर्च दवाखान्यांची नावे व कालावधी व वैद्यकीय प्रमाणपत्र</p>
+                <hr class="border border-1 border-danger" />
+            </div>
         </div>
+            <!--Row Eight-->
+        <br />
+        <!--Row Nine-->
+      <div class="row">
+          <div class="col-md-1"></div>
+          <div class="col-md-5">
+              <label class="fw-bold">
+                  विद्यार्थ्यास अपघात झाल्यास दिनांक:
+              </label>
+              <asp:TextBox ID="txtAccidentDate" runat="server" CssClass="form-control" ToolTip="विद्यार्थ्यास अपघात झाल्यास दिनांक" TextMode="Date"></asp:TextBox>
+       <asp:RequiredFieldValidator ID="rfvAccidentDate" runat="server" ControlToValidate="txtAccidentDate" ErrorMessage="* Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+              </div>
+          <div class="col-md-5">
+                              <label class="fw-bold">
+                    उपचार घेतलेल्या दवाखान्याचे नाव:
+                </label>
+              <input id="txtHospital_d" list="hospList" class="form-control" placeholder=" उपचार घेतलेल्या दवाखान्याचे नाव" />
+<datalist id="hospList"></datalist>
+          </div>
+      </div>
+        <!--Row Nine-->
+        <br />
+       <!--Row Ten-->
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+           <asp:TextBox ID="txtHospitalName" runat="server" CssClass="form-control" ToolTip="उपचार घेतलेल्या दवाखान्याचे नाव"  ></asp:TextBox>
+<%--                <asp:Label ID="lblHospitalName" runat="server" CssClass="fw-bold form-control"  ToolTip="उपचार घेतलेल्या दवाखान्याचे नाव" BorderWidth="5"  BorderColor="AliceBlue"></asp:Label>--%>
+            
+            
+            </div>
+           
+        </div>
+         <!--Row Ten-->
+        <br />
+        <!--Row Eleven-->
+      <div class="row">
+          <div class="col-md-4">
+              <label class="fw-bold">
+                दवाखान्यात दाखल झाल्याची तारीख: 
+              </label>
+              <asp:TextBox ID="txtAdmittedDate" runat="server" CssClass="form-control" Placeholder="Admitted Date (yyyy-mm-dd)" TextMode="Date" ToolTip="दवाखान्यात दाखल झाल्याची तारीख"></asp:TextBox><br />
+              <asp:RequiredFieldValidator ID="rfvAdmittedDate" runat="server" ControlToValidate="txtAdmittedDate" ErrorMessage="* Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+          </div>
+           <div class="col-md-4">
+     <label class="fw-bold">
+            दवाखान्यातून डिस्चार्ज झाल्याची तारीख:
+     </label>
+<asp:TextBox ID="txtDischargeDate" runat="server" CssClass="form-control" Placeholder="Discharge Date (yyyy-mm-dd)" TextMode="Date" ToolTip=" दवाखान्यातून डिस्चार्ज झाल्याची तारीख"></asp:TextBox><br />
+<asp:RequiredFieldValidator ID="frvdischargeDate" runat="server" ControlToValidate="txtDischargeDate" ErrorMessage="* Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+ </div>
+           <div class="col-md-4">
+     <label class="fw-bold">
+         उपचारासाठी झालेला खर्च: 
+     </label>
+               <asp:TextBox ID="txtExpenses" runat="server" CssClass="form-control" Placeholder=" उपचारासाठी झालेला खर्च" ToolTip=" उपचारासाठी झालेला खर्च"></asp:TextBox>
+ <asp:RequiredFieldValidator ID="rfvExpenses" runat="server" ControlToValidate="txtExpenses" ErrorMessage="* Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+           </div>
+      </div>
+        <!--Row Eleven-->
+        <br />
+        <div class="row">
+            <div class="col-md-12 mx-auto text-center">
+<asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+            </div>
+        </div>
+     <br />
+        <!--Row Tweleve-->
+        <div class="row">
+            <div class="col-md-4 mx-auto">
+                <label class="fw-bold">
+                    वैद्यकीय प्रमाणपत्र प्रत:  <span class="blockquote-footer">Only .pdf maximum 5 mb</span>
+                </label>
+                <asp:FileUpload ID="fuHospitalCertMulti" runat="server" CssClass="form-control" />
+                <asp:RequiredFieldValidator ID="rfvHospitalCertMulti" runat="server" ControlToValidate="fuHospitalCertMulti" ErrorMessage="* Required" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+            </div>
+        </div>
+          <!--Row Tweleve-->
+        <br />
+<asp:Button ID="btnAddHospital" runat="server" Text="Add Record" OnClick="btnAddHospital_Click" CssClass="btn btn-primary" CausesValidation="false" OnClientClick="return validateForm();" />
+        <!--Row Thirteen-->
+<div class="row">
+    <div class="col-md-12">
+        <hr />
+        <p class="fw-bold fs-5 text-center">
+            उपचार घेतलेल्या दवाखान्याची यादी 
+        </p>
+    
 
+
+
+
+    <asp:GridView ID="gvHospitals" runat="server"
+    CssClass="table table-bordered table-striped"
+    AutoGenerateColumns="False"
+    DataKeyNames="RecordId"
+    OnRowDeleting="gvHospitals_RowDeleting" OnRowDataBound="gvHospitals_RowDataBound">
+
+    <Columns>
+
+                <asp:TemplateField HeaderText="क्रमांक">
+    <ItemTemplate>
+        <%# Container.DataItemIndex + 1 %>
+    </ItemTemplate>
+</asp:TemplateField>
+        <asp:BoundField DataField="RecordId" HeaderText="रेकॉर्ड आयडी" ReadOnly="True" />
+        <asp:BoundField DataField="HospitalName" HeaderText="दवाखान्याचे नाव" />
+        <asp:BoundField DataField="AdmittedDate" HeaderText="दाखल झाल्याची तारीख" DataFormatString="{0:dd-MM-yyyy}" />
+        <asp:BoundField DataField="DischargeDate" HeaderText="डिस्चार्ज झाल्याची तारीख" DataFormatString="{0:dd-MM-yyyy}" />
+        <asp:BoundField DataField="TotalExpenses" HeaderText="उपचारासाठी झालेला खर्च (₹)" />
+
+        <asp:TemplateField HeaderText="वैद्यकीय प्रमाणपत्र प्रत">
+            <ItemTemplate>
+                <asp:HyperLink ID="lnkFile" runat="server" Text="View PDF" 
+                    NavigateUrl='<%# Eval("MultiHospitalsDoc") %>' 
+                    Target="_blank"
+                    CssClass="btn btn-sm btn-info text-white"></asp:HyperLink>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:CommandField ShowDeleteButton="True" HeaderText="Delete" 
+            DeleteText="Delete"  ControlStyle-CssClass="btn btn-danger"/>
+    </Columns>
+</asp:GridView>
+
+<asp:Label ID="Label1" runat="server" CssClass="fw-bold mt-3 d-block"></asp:Label>
+
+            </div>
+</div>
+         <!--Row Thirteen-->
+        </div>
      
     
 </asp:Content>
