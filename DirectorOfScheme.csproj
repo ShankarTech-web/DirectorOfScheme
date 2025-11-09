@@ -92,6 +92,7 @@
     <Content Include="LoginPage.aspx" />
     <Content Include="Scheme\RajivGandhiAccSch.aspx" />
     <Content Include="Scheme\RGSchemeApplicationForm.aspx" />
+    <Content Include="Scheme\RGSchemeAppPartTwo.aspx" />
     <Content Include="Scheme\TrackApplication.aspx" />
     <Content Include="School\SchoolDashboard.aspx" />
     <Content Include="School\SchoolLogin.aspx" />
@@ -152,6 +153,13 @@
     </Compile>
     <Compile Include="Scheme\RGSchemeApplicationForm.aspx.designer.cs">
       <DependentUpon>RGSchemeApplicationForm.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Scheme\RGSchemeAppPartTwo.aspx.cs">
+      <DependentUpon>RGSchemeAppPartTwo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Scheme\RGSchemeAppPartTwo.aspx.designer.cs">
+      <DependentUpon>RGSchemeAppPartTwo.aspx</DependentUpon>
     </Compile>
     <Compile Include="Scheme\TrackApplication.aspx.cs">
       <DependentUpon>TrackApplication.aspx</DependentUpon>
@@ -216,6 +224,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="AccidentDocuments\" />
     <Folder Include="MultiHospitalsDoc\" />
     <Folder Include="PrincipalsPhoto\" />
     <Folder Include="Uploads\" />

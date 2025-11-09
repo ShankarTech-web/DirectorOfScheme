@@ -351,6 +351,33 @@
             </div>
 </div>
          <!--Row Thirteen-->
+        <br />
+       
+
+<!-- Required Documents -->
+<asp:GridView ID="gvDocuments" runat="server" AutoGenerateColumns="False" CssClass="table table-bordered">
+    <Columns>
+        <asp:BoundField DataField="DocumentID" HeaderText="Doc ID" Visible="false" />
+        <asp:BoundField DataField="DocumentName" HeaderText="Required Document" />
+        <asp:TemplateField HeaderText="Upload File">
+            <ItemTemplate>
+                <asp:FileUpload ID="fuDocument" runat="server" />
+            </ItemTemplate>
+        </asp:TemplateField>
+    </Columns>
+</asp:GridView>
+
+<br />
+
+
+        <div class="row">
+    <div class="col-md-12 text-center">
+        <asp:Button ID="btnNextPart" runat="server" CssClass="btn btn-warning" Text="Proceed to Document Upload →" OnClick="btnNextPart_Click" />
+    </div>
+</div>
+
+
+        <!--Row Fourteen-->
         </div>
      
     

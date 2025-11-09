@@ -142,7 +142,7 @@ namespace DirectorOfScheme.Scheme
 
         protected void btnAddHospital_Click(object sender, EventArgs e)
         {
-            string hospitalName = txtSchoolDist.Text.Trim();
+            string hospitalName = txtHospitalName.Text.Trim();
 
             // Validate dates
             if (!DateTime.TryParse(txtAdmittedDate.Text, out DateTime admittedDate) ||
@@ -495,6 +495,253 @@ namespace DirectorOfScheme.Scheme
                 lblMessage.ForeColor = System.Drawing.Color.Red;
             }
         }
+
+
+        // 📑 Populate required documents based on Accident Type
+        //protected void ddlAccidentType_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+        //    using (SqlConnection con = new SqlConnection(conStr))
+        //    {
+        //        SqlDataAdapter da = new SqlDataAdapter(
+        //            "SELECT DocumentID, DocumentName FROM RequiredDocuments WHERE AccidentType=@AccidentType", con);
+        //        da.SelectCommand.Parameters.AddWithValue("@AccidentType", ddlAccidentType.SelectedValue);
+
+        //        DataTable dt = new DataTable();
+        //        da.Fill(dt);
+
+        //        gvDocuments.DataSource = dt;
+        //        gvDocuments.DataKeyNames = new[] { "DocumentID" };
+        //        gvDocuments.DataBind();
+        //    }
+        //}
+        protected void btnFinalSubmit_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (Session["ApplicationId"] == null)
+                {
+                    lblMessage.Text = "Session expired. Please reload the page.";
+                    lblMessage.ForeColor = System.Drawing.Color.Red;
+                    return;
+                }
+
+                string appId = Session["ApplicationId"].ToString();
+
+                // 🟢 Check if hospital data exists
+                bool hasMultiple = HasMultipleHospitals(appId);
+
+                // If no hospital records exist, insert the single hospital data
+                if (!hasMultiple)
+                {
+                    string hospitalName = txtHospitalName.Text.Trim();
+                    if (string.IsNullOrEmpty(hospitalName))
+                    {
+                        lblMessage.Text = "Please enter hospital name before final submit.";
+                        lblMessage.ForeColor = System.Drawing.Color.Red;
+                        return;
+                    }
+
+                    if (!DateTime.TryParse(txtAdmittedDate.Text, out DateTime admittedDate) ||
+                        !DateTime.TryParse(txtDischargeDate.Text, out DateTime dischargeDate) ||
+                        !DateTime.TryParse(txtAccidentDate.Text, out DateTime accidentDate))
+                    {
+                        lblMessage.Text = "Please enter valid hospital dates.";
+                        lblMessage.ForeColor = System.Drawing.Color.Red;
+                        return;
+                    }
+
+                    if (!decimal.TryParse(txtExpenses.Text, out decimal totalExpenses))
+                    {
+                        lblMessage.Text = "Invalid expense amount.";
+                        lblMessage.ForeColor = System.Drawing.Color.Red;
+                        return;
+                    }
+
+                    if (!fuHospitalCertMulti.HasFile)
+                    {
+                        lblMessage.Text = "Please upload the hospital certificate PDF.";
+                        lblMessage.ForeColor = System.Drawing.Color.Red;
+                        return;
+                    }
+
+                    string fileExt = Path.GetExtension(fuHospitalCertMulti.FileName);
+                    if (!string.Equals(fileExt, ".pdf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        lblMessage.Text = "Only PDF hospital certificate allowed.";
+                        lblMessage.ForeColor = System.Drawing.Color.Red;
+                        return;
+                    }
+
+                    string saveDir = Server.MapPath("~/MultiHospitalsDoc/");
+                    if (!Directory.Exists(saveDir))
+                        Directory.CreateDirectory(saveDir);
+
+                    string fileName = $"{appId}-1{fileExt}";
+                    string fullSavePath = Path.Combine(saveDir, fileName);
+                    fuHospitalCertMulti.SaveAs(fullSavePath);
+
+                    string relativePath = $"~/MultiHospitalsDoc/{fileName}";
+
+                    // Insert single hospital record
+                    using (SqlConnection con = new SqlConnection(conStr))
+                    {
+                        string insertQuery = @"INSERT INTO HospitalRecords 
+                    (ApplicationId, HospitalName, AdmittedDate, DischargeDate, TotalExpenses, MultiHospitalsDoc, IPAddress)
+                    VALUES (@ApplicationId, @HospitalName, @AdmittedDate, @DischargeDate, @TotalExpenses, @MultiHospitalsDoc, @IPAddress)";
+                        using (SqlCommand cmd = new SqlCommand(insertQuery, con))
+                        {
+                            cmd.Parameters.AddWithValue("@ApplicationId", appId);
+                            cmd.Parameters.AddWithValue("@HospitalName", hospitalName);
+                            cmd.Parameters.AddWithValue("@AdmittedDate", admittedDate);
+                            cmd.Parameters.AddWithValue("@DischargeDate", dischargeDate);
+                            cmd.Parameters.AddWithValue("@TotalExpenses", totalExpenses);
+                            cmd.Parameters.AddWithValue("@MultiHospitalsDoc", relativePath);
+                            cmd.Parameters.AddWithValue("@IPAddress", HttpContext.Current.Request.UserHostAddress);
+                            con.Open();
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+
+                // 🟡 After hospital logic, continue uploading required documents
+                string docFolder = Server.MapPath("~/AccidentDocuments/");
+                if (!Directory.Exists(docFolder))
+                    Directory.CreateDirectory(docFolder);
+
+                int uploadedCount = 0;
+                List<string> missingDocs = new List<string>();
+
+                foreach (GridViewRow row in gvDocuments.Rows)
+                {
+                    string documentID = ((DataBoundLiteralControl)row.Cells[0].Controls[0]).Text.Trim();
+                    string documentName = row.Cells[1].Text.Trim();
+                    FileUpload fu = (FileUpload)row.FindControl("fuDocument");
+
+                    if (fu != null && fu.HasFile)
+                    {
+                        string ext = Path.GetExtension(fu.FileName);
+                        if (!string.Equals(ext, ".pdf", StringComparison.OrdinalIgnoreCase))
+                        {
+                            lblMessage.Text = $"Only PDF files are allowed for {documentName}.";
+                            lblMessage.ForeColor = System.Drawing.Color.Red;
+                            return;
+                        }
+
+                        string cleanName = documentName.Replace(" ", "").Replace("/", "").Replace("\\", "");
+                        string fileName = $"{appId}-{cleanName}{ext}";
+                        string fullSavePath = Path.Combine(docFolder, fileName);
+                        fu.SaveAs(fullSavePath);
+
+                        string relativePath = $"~/AccidentDocuments/{fileName}";
+
+                        using (SqlConnection con = new SqlConnection(conStr))
+                        {
+                            string query = @"INSERT INTO UploadedDocuments 
+                        (ApplicationId, DocumentID, DocumentName, FilePath, UploadedOn, IPAddress)
+                        VALUES (@ApplicationId, @DocumentID, @DocumentName, @FilePath, GETDATE(), @IPAddress)";
+                            using (SqlCommand cmd = new SqlCommand(query, con))
+                            {
+                                cmd.Parameters.AddWithValue("@ApplicationId", appId);
+                                cmd.Parameters.AddWithValue("@DocumentID", documentID);
+                                cmd.Parameters.AddWithValue("@DocumentName", documentName);
+                                cmd.Parameters.AddWithValue("@FilePath", relativePath);
+                                cmd.Parameters.AddWithValue("@IPAddress", HttpContext.Current.Request.UserHostAddress);
+                                con.Open();
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        uploadedCount++;
+                    }
+                    else
+                    {
+                        missingDocs.Add(documentName);
+                    }
+                }
+
+                lblMessage.ForeColor = System.Drawing.Color.Green;
+                lblMessage.Text = hasMultiple
+                    ? $"✅ Multiple hospital records already added. {uploadedCount} documents uploaded successfully."
+                    : $"✅ Single hospital details inserted and {uploadedCount} documents uploaded successfully.";
+            }
+            catch (Exception ex)
+            {
+                lblMessage.Text = "❌ Error: " + ex.Message;
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+
+
+
+        private bool HasMultipleHospitals(string appId)
+        {
+            using (SqlConnection con = new SqlConnection(conStr))
+            {
+                string query = "SELECT COUNT(*) FROM HospitalRecords WHERE ApplicationId = @ApplicationId";
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@ApplicationId", appId);
+                    con.Open();
+                    int count = Convert.ToInt32(cmd.ExecuteScalar());
+                    return count > 0;
+                }
+            }
+        }
+        protected void btnNextPart_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Ensure Session ApplicationID exists
+                string appId = Session["ApplicationId"]?.ToString();
+                if (string.IsNullOrEmpty(appId))
+                {
+                    lblMessage.Text = "Session expired. Please reload the page.";
+                    lblMessage.ForeColor = System.Drawing.Color.Red;
+                    return;
+                }
+
+                // Basic validation for applicant name
+                if (string.IsNullOrWhiteSpace(txtApplicantFullName.Text))
+                {
+                    lblMessage.Text = "Please enter applicant full name.";
+                    lblMessage.ForeColor = System.Drawing.Color.Red;
+                    return;
+                }
+
+                // Insert Accident & Applicant details into a main table (example)
+                using (SqlConnection con = new SqlConnection(conStr))
+                {
+                    string query = @"INSERT INTO AccidentDetails
+                            (ApplicationId, ApplicantName, DOB, Age, DistrictId, TalukaId, AccidentDate, CreatedOn, IPAddress)
+                            VALUES (@ApplicationId, @ApplicantName, @DOB, @Age, @DistrictId, @TalukaId, @AccidentDate,  GETDATE(), @IPAddress)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@ApplicationId", appId);
+                        cmd.Parameters.AddWithValue("@ApplicantName", txtApplicantFullName.Text.Trim());
+                        cmd.Parameters.AddWithValue("@DOB", string.IsNullOrEmpty(txtDOB.Text) ? (object)DBNull.Value : Convert.ToDateTime(txtDOB.Text));
+                        cmd.Parameters.AddWithValue("@Age", txtAge.Text.Replace(" years", "").Trim());
+                        cmd.Parameters.AddWithValue("@DistrictId", ddldist.SelectedValue);
+                        cmd.Parameters.AddWithValue("@TalukaId", ddltaluka.SelectedValue);
+                        cmd.Parameters.AddWithValue("@AccidentDate", string.IsNullOrEmpty(txtAccidentDate.Text) ? (object)DBNull.Value : Convert.ToDateTime(txtAccidentDate.Text));
+                        //cmd.Parameters.AddWithValue("@AccidentType", ddlAccidentType.SelectedValue);
+                        cmd.Parameters.AddWithValue("@IPAddress", HttpContext.Current.Request.UserHostAddress);
+
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                // Redirect to next part for document upload
+                Response.Redirect("~/Scheme/RGSchemeAppPartTwo.aspx", false);
+            }
+            catch (Exception ex)
+            {
+                lblMessage.Text = "Error: " + ex.Message;
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+
+
 
     }
 }
